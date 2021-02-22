@@ -29,15 +29,17 @@
       </li>
     </ul>
 
-    <IndexPoint class="index-point" :num="images.length">
+    <IndexPoint class="index-point" :num="images.length" @btnClick="btnClick">
       <template>
         <li
           v-for="(item, index) in images"
-          :key="item.id"
+          :key="'point' + item.id"
           :class="{ active: index == pointIndex }"
+          :id="index"
         ></li>
       </template>
     </IndexPoint>
+
     <ImgBtn class="btn btn-right"></ImgBtn>
   </div>
 </template>
@@ -83,6 +85,7 @@ export default {
       return -(this.imgWidth + this.imgWidth * this.imgIndex);
     },
     pointIndex() {
+      // 图片索引在动画时会越界，使用计算数据防止小圆点越界
       if (this.imgIndex == -1) {
         return this.images.length - 1;
       } else if (this.imgIndex == this.images.length) {
@@ -95,7 +98,7 @@ export default {
   mounted() {
     // 计算单个图片的宽度，做移动端适配
     this.imgWidth = this.$refs.img[0].offsetWidth;
-    this.autoPlay();
+    // this.autoPlay();
   },
   methods: {
     move() {
@@ -138,7 +141,7 @@ export default {
       this.startX = 0;
       this.moveX = 0;
       this.flag = Date.now();
-      this.autoPlay();
+      // this.autoPlay();
     },
     transEnd() {
       if (this.imgIndex == -1) {
@@ -158,6 +161,10 @@ export default {
         this.imgIndex++;
         this.move();
       }, 3000);
+    },
+    btnClick(e) {
+      this.imgIndex = e.target.id;
+      this.move();
     }
   }
 };
