@@ -1,6 +1,8 @@
 .<template>
   <!-- 根据计算的单个图片宽度，动态的绑定外层 div 宽度 -->
   <div class="slider" :style="{ width: imgWidth + 'px' }">
+    <ImgBtn class="btn btn-left"></ImgBtn>
+
     <!-- 克隆了一张图片后，动态的向左偏移负的单张图片的宽度 -->
     <ul
       ref="ul"
@@ -26,13 +28,29 @@
         <img :src="images[0].src" alt="" class="roll-img" />
       </li>
     </ul>
+
+    <IndexPoint class="index-point" :num="images.length">
+      <template>
+        <li
+          v-for="(item, index) in images"
+          :key="item.id"
+          :class="{ active: index == pointIndex }"
+        ></li>
+      </template>
+    </IndexPoint>
+    <ImgBtn class="btn btn-right"></ImgBtn>
   </div>
 </template>
 
 <script>
+import ImgBtn from '@/components/common/ImgBtn';
+import IndexPoint from '@/components/common/IndexPoint';
 export default {
   name: 'TouchSlider',
-  components: {},
+  components: {
+    ImgBtn,
+    IndexPoint
+  },
   props: {
     // 图片队列
     images: Array,
@@ -63,6 +81,15 @@ export default {
     // 图片移动的距离，等于当前图片宽度 加上 图片宽度乘以图片序列，结果为负数
     translateX() {
       return -(this.imgWidth + this.imgWidth * this.imgIndex);
+    },
+    pointIndex() {
+      if (this.imgIndex == -1) {
+        return this.images.length - 1;
+      } else if (this.imgIndex == this.images.length) {
+        return 0;
+      } else {
+        return this.imgIndex;
+      }
     }
   },
   mounted() {
@@ -104,7 +131,7 @@ export default {
       } else if (this.moveX < -70) {
         this.imgIndex++;
         this.move();
-        // 当在二者之间时，图片归为
+        // 当在二者之间时，图片归位
       } else {
         this.move();
       }
@@ -142,10 +169,36 @@ export default {
 }
 
 .slider {
+  position: relative;
   overflow: hidden;
 }
 .wrapper {
   display: flex;
+}
+
+.btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.btn-right {
+  right: 0;
+}
+
+.index-point {
+  position: absolute;
+  bottom: 5%;
+}
+.index-point li {
+  height: 10px;
+  width: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s;
+  border-radius: 10px;
+}
+.index-point li.active {
+  width: 20px;
 }
 
 @media only screen and (max-width: 376px) {

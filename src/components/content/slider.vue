@@ -1,5 +1,5 @@
 .<template>
-  <div class="slider">
+  <div class="touch-slider">
     <TouchSlider :images="images" :animeTime="'500ms'" />
   </div>
 </template>
@@ -24,4 +24,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.touch-slider {
+  position: relative;
+}
+</style>
