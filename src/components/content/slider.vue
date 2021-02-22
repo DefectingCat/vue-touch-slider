@@ -1,6 +1,6 @@
 .<template>
   <div class="touch-slider">
-    <TouchSlider :images="images" :animeTime="'500ms'" />
+    <TouchSlider :images="images" :animeTime="'500'" />
   </div>
 </template>
 

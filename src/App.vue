@@ -5,6 +5,8 @@
 </template>
 
 <script>
+// 引入 iconfont
+import './assets/js/iconfont.js';
 import slider from '@/components/content/slider';
 export default {
   name: 'App',

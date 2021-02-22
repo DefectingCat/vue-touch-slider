@@ -1,6 +1,6 @@
 .<template>
   <div>
-    <ol ref="ol" @click="btnClick">
+    <ol ref="ol" @click="pointClick">
       <slot>
         <li></li>
       </slot>
@@ -18,9 +18,9 @@ export default {
     this.$refs.ol.style.width = `${this.num * 10 * 2}px`;
   },
   methods: {
-    btnClick(e) {
+    pointClick(e) {
       if (e.target.nodeName.toLowerCase() == 'li') {
-        this.$emit('btnClick', e);
+        this.$emit('pointClick', e);
       }
     }
   }

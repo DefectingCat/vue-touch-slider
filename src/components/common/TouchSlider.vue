@@ -1,7 +1,13 @@
 .<template>
   <!-- 根据计算的单个图片宽度，动态的绑定外层 div 宽度 -->
   <div class="slider" :style="{ width: imgWidth + 'px' }">
-    <ImgBtn class="btn btn-left"></ImgBtn>
+    <ImgBtn class="btn btn-left" @click.native="previous">
+      <template>
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-zuo"></use>
+        </svg>
+      </template>
+    </ImgBtn>
 
     <!-- 克隆了一张图片后，动态的向左偏移负的单张图片的宽度 -->
     <ul
@@ -29,7 +35,11 @@
       </li>
     </ul>
 
-    <IndexPoint class="index-point" :num="images.length" @btnClick="btnClick">
+    <IndexPoint
+      class="index-point"
+      :num="images.length"
+      @pointClick="pointClick"
+    >
       <template>
         <li
           v-for="(item, index) in images"
@@ -40,13 +50,20 @@
       </template>
     </IndexPoint>
 
-    <ImgBtn class="btn btn-right"></ImgBtn>
+    <ImgBtn class="btn btn-right" @click.native="next">
+      <template>
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-you"></use>
+        </svg>
+      </template>
+    </ImgBtn>
   </div>
 </template>
 
 <script>
 import ImgBtn from '@/components/common/ImgBtn';
 import IndexPoint from '@/components/common/IndexPoint';
+
 export default {
   name: 'TouchSlider',
   components: {
@@ -103,12 +120,12 @@ export default {
   methods: {
     move() {
       // 移动方法，添加过渡动画，根据图片序列移动图片
-      this.imgBoxStyle.transition = `all ${this.animeTime}`;
+      this.imgBoxStyle.transition = `all ${this.animeTime}ms`;
       this.imgBoxStyle.transform = `translateX(${this.translateX}px)`;
     },
     touchStart(e) {
       // 触摸开始
-      if (Date.now() - this.flag > 300) {
+      if (Date.now() - this.flag > Number(this.animeTime) + 10) {
         clearInterval(this.timer);
         // 获取点击时的 X 坐标
         this.startX = e.touches[0].clientX;
@@ -116,7 +133,7 @@ export default {
     },
     touchMove(e) {
       // 防止在一定时间内过渡滑动
-      if (Date.now() - this.flag > 300) {
+      if (Date.now() - this.flag > Number(this.animeTime) + 10) {
         // 移动时的坐标减去点击时的坐标等于移动的距离
         this.moveX = e.touches[0].clientX - this.startX;
         // 移动图片
@@ -126,22 +143,24 @@ export default {
       }
     },
     touchEnd() {
-      // 当触摸大于 70 像素，触发移动动画，移动完整图片
-      if (this.moveX > 70) {
-        this.imgIndex--;
-        this.move();
-        // 当触摸小于 -70 像素，触发移动动画，移动完整图片
-      } else if (this.moveX < -70) {
-        this.imgIndex++;
-        this.move();
-        // 当在二者之间时，图片归位
-      } else {
-        this.move();
+      if (Date.now() - this.flag > Number(this.animeTime) + 10) {
+        // 当触摸大于 70 像素，触发移动动画，移动完整图片
+        if (this.moveX > 70) {
+          this.imgIndex--;
+          this.move();
+          // 当触摸小于 -70 像素，触发移动动画，移动完整图片
+        } else if (this.moveX < -70) {
+          this.imgIndex++;
+          this.move();
+          // 当在二者之间时，图片归位
+        } else {
+          this.move();
+        }
+        this.startX = 0;
+        this.moveX = 0;
+        this.flag = Date.now();
+        // this.autoPlay();
       }
-      this.startX = 0;
-      this.moveX = 0;
-      this.flag = Date.now();
-      // this.autoPlay();
     },
     transEnd() {
       if (this.imgIndex == -1) {
@@ -162,9 +181,23 @@ export default {
         this.move();
       }, 3000);
     },
-    btnClick(e) {
+    pointClick(e) {
       this.imgIndex = e.target.id;
       this.move();
+    },
+    previous() {
+      if (Date.now() - this.flag > Number(this.animeTime) + 10) {
+        this.imgIndex--;
+        this.move();
+        this.flag = Date.now();
+      }
+    },
+    next() {
+      if (Date.now() - this.flag > Number(this.animeTime) + 10) {
+        this.imgIndex++;
+        this.move();
+        this.flag = Date.now();
+      }
     }
   }
 };
@@ -195,7 +228,9 @@ export default {
 
 .index-point {
   position: absolute;
-  bottom: 5%;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .index-point li {
   height: 10px;
