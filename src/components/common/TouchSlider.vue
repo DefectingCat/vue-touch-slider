@@ -11,7 +11,6 @@
 
     <!-- 克隆了一张图片后，动态的向左偏移负的单张图片的宽度 -->
     <ul
-      ref="ul"
       class="wrapper"
       :style="{
         width: imgWidth * images.length + 'px',
@@ -22,6 +21,8 @@
       @touchmove="touchMove"
       @touchend="touchEnd"
       @transitionend="transEnd"
+      @mouseover="pausePlay"
+      @mouseout="autoPlay"
     >
       <!-- 克隆最后一张图片 -->
       <li>
@@ -81,18 +82,21 @@ export default {
     return {
       // 单张图片的宽度
       imgWidth: 0,
+      // 图片索引，用于控制位置
+      imgIndex: 0,
       // 点击时的坐标
       startX: 0,
       // 移动的距离
       moveX: 0,
-      // 图片索引，用于控制位置
-      imgIndex: 0,
       // 等待过渡完成再结束触摸响应，防止在一定时间内过渡滑动
       flag: Date.now(),
       // 延时
       timer: 0,
+      // 移动位置
       tlatex: '',
+      // 过渡时间
       tsionx: '',
+      // 保存触摸前图片的位置
       lastX: 0
     };
   },
@@ -133,7 +137,7 @@ export default {
     // 计算单个图片的宽度，做移动端适配
     this.imgWidth = this.$refs.img[0].offsetWidth;
     this.move(false);
-    // this.autoPlay();
+    this.autoPlay();
   },
   methods: {
     move(anime) {
@@ -199,9 +203,12 @@ export default {
     },
     autoPlay() {
       this.timer = setInterval(() => {
-        this.imgIndex++;
-        this.move(true);
-        this.transEnd();
+        // 当页面处于后台时，transEnd会失效
+        if (document.visibilityState != 'hidden') {
+          this.imgIndex++;
+          this.move(true);
+        }
+        console.log(document.visibilityState);
       }, 3000);
     },
     pointClick(e) {
@@ -221,6 +228,9 @@ export default {
         this.move(true);
         this.flag = Date.now();
       }
+    },
+    pausePlay() {
+      clearInterval(this.timer);
     }
   }
 };
