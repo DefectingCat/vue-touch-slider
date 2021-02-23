@@ -88,7 +88,7 @@ export default {
       imgIndex: 0,
       // 等待过渡完成再结束触摸响应，防止在一定时间内过渡滑动
       flag: Date.now(),
-      // 延时序列号
+      // 延时
       timer: 0
     };
   },
@@ -115,7 +115,7 @@ export default {
   mounted() {
     // 计算单个图片的宽度，做移动端适配
     this.imgWidth = this.$refs.img[0].offsetWidth;
-    // this.autoPlay();
+    this.autoPlay();
   },
   methods: {
     move() {
@@ -159,7 +159,7 @@ export default {
         this.startX = 0;
         this.moveX = 0;
         this.flag = Date.now();
-        // this.autoPlay();
+        this.autoPlay();
       }
     },
     transEnd() {
@@ -179,6 +179,7 @@ export default {
       this.timer = setInterval(() => {
         this.imgIndex++;
         this.move();
+        this.transEnd();
       }, 3000);
     },
     pointClick(e) {
