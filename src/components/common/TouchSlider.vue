@@ -1,7 +1,7 @@
 .<template>
   <!-- 根据计算的单个图片宽度，动态的绑定外层 div 宽度 -->
   <div class="slider" :style="{ width: imgWidth + 'px' }">
-    <ImgBtn class="btn btn-left" @click.native="previous">
+    <ImgBtn class="btn btn-left" @click.native="previous" v-if="hasBtn">
       <template>
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-zuo"></use>
@@ -52,7 +52,7 @@
       </template>
     </IndexPoint>
 
-    <ImgBtn class="btn btn-right" @click.native="next">
+    <ImgBtn class="btn btn-right" @click.native="next" v-if="hasBtn">
       <template>
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-you"></use>
@@ -97,7 +97,9 @@ export default {
       // 过渡时间
       tsionx: '',
       // 保存触摸前图片的位置
-      lastX: 0
+      lastX: 0,
+      // 控制按钮显示
+      hasBtn: true
     };
   },
   computed: {
@@ -138,6 +140,9 @@ export default {
     this.imgWidth = this.$refs.img[0].offsetWidth;
     this.move(false);
     this.autoPlay();
+    if (this.imgWidth < 400) {
+      this.hasBtn = false;
+    }
   },
   methods: {
     move(anime) {
@@ -150,9 +155,9 @@ export default {
       this.translateX = -(this.imgWidth + this.imgWidth * this.imgIndex);
     },
     touchStart(e) {
+      this.pausePlay();
       // 触摸开始
       if (Date.now() - this.flag > Number(this.animeTime) + 10) {
-        clearInterval(this.timer);
         // 获取点击时的 X 坐标
         this.startX = e.touches[0].clientX;
         // 点击开始时保存当前图片的位置
@@ -187,8 +192,8 @@ export default {
         this.startX = 0;
         this.moveX = 0;
         this.flag = Date.now();
-        this.autoPlay();
       }
+      this.autoPlay();
     },
     transEnd() {
       if (this.imgIndex == -1) {
