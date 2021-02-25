@@ -171,14 +171,28 @@ export default {
         this.moveX = e.touches[0].clientX - this.startX;
         // 移动图片
         this.transitionX = `none`;
-        // 滑动位置等于上次的位置加上手指移动的距离
-        this.translateX = this.lastX + this.moveX;
+        // 防止滑动过渡
+        if (this.moveX >= this.imgWidth) {
+          this.moveX = this.imgWidth;
+          // 滑动位置等于上次的位置加上手指移动的距离
+          this.translateX = this.lastX + this.moveX;
+        } else if (this.moveX < 0 && this.moveX <= -this.imgWidth) {
+          this.moveX = -this.imgWidth;
+          this.translateX = this.lastX + this.moveX;
+        } else {
+          this.translateX = this.lastX + this.moveX;
+        }
       }
     },
     touchEnd() {
       if (Date.now() - this.flag > Number(this.animeTime) + 10) {
-        // 当触摸大于 70 像素，触发移动动画，移动完整图片
-        if (this.moveX > 70) {
+        // 防止滑动过渡
+        if (this.moveX == this.imgWidth || this.moveX == -this.imgWidth) {
+          this.moveX > 0 ? this.imgIndex-- : this.imgIndex++;
+          // 当越界时，调用恢复队列
+          this.transEnd();
+          // 当触摸大于 70 像素，触发移动动画，移动完整图片
+        } else if (this.moveX > 70) {
           this.imgIndex--;
           this.move(true);
           // 当触摸小于 -70 像素，触发移动动画，移动完整图片
